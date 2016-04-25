@@ -56,6 +56,21 @@ public class ImageData
         System.Drawing.Image img = System.Drawing.Image.FromStream(ms);
         return img;
     }
+    public static Neurotec.Images.NImage getNImageDataFromBytes(byte[] blob)
+    {
+        /*
+        openconn();
+        string sql = "select IMGDATA from t_img where imgID=100";
+        MySqlCommand comm = new MySqlCommand(sql,conn);
+        MySqlDataReader msr = comm.ExecuteReader();
+        Byte[] blob = new Byte[(msr.GetBytes(2, 0, null, 0, int.MaxValue))];
+        msr.GetBytes(2, 0, blob, 0, blob.Length);
+        */
+        Neurotec.IO.NMemoryStream ms = new Neurotec.IO.NMemoryStream(blob);
+        //  System.IO.MemoryStream ms = new System.IO.MemoryStream(blob);
+        Neurotec.Images.NImage img = Neurotec.Images.NImage.FromStream(ms);
+        return img;
+    }
     public static bool SaveQuery(Theme theme)
     {
          
@@ -64,10 +79,10 @@ public class ImageData
        
       //  param[0] = new MySqlParameter("@ID", theme.ID);
         param[0] = new MySqlParameter("@data", theme.data);
-        insert(param);
+        inserttotest(param);
         return true;
     }
-    private static void insert(MySqlParameter[] param)
+    private static void inserttotest(MySqlParameter[] param)
     {
         MySqlConnection conn = new MySqlConnection("server=localhost;database=test;uid=root;password=root");
         string sqlcommand = "insert into imgdata(data) values(@data)";
@@ -88,6 +103,25 @@ public class ImageData
             Console.Read();
         }
         conn.Close();
+    }
+    public static byte[] setSelectfromresult(String uderid)
+    {
+        MySqlConnection conn = new MySqlConnection("server=localhost;database=resultshow;uid=root;password=root");
+        conn.Open();
+        String sqlcommand = String.Format("select data from imgdata where id='{0}'", uderid);
+        MySqlCommand cmd = new MySqlCommand(sqlcommand, conn);
+        MySqlDataReader msr = cmd.ExecuteReader();
+        msr.Read();
+
+        // byte[] blob = new byte[(msr.GetBytes(2, 0, null, 0, int.MaxValue))];
+        // msr.GetBytes(2, 0, blob, 0, blob.Length);
+        byte[] blob = (byte[])msr.GetValue(0);
+        conn.Close();
+        msr.Close();
+        msr.Dispose();
+        //String xmlStr = Encoding.Unicode.GetString(blob);
+        //query.LoadFromString(xmlStr);
+        return blob;
     }
     public static byte[] setSelect(String uderid)
     {
