@@ -40,7 +40,7 @@ public partial class Default4 : System.Web.UI.Page
         _biometricClient.Initialize();
         */
         MySqlConnection conn = new MySqlConnection("server=localhost;database=test;uid=root;password=root");
-        String sqlcommand = "select *  from resultshow";
+        String sqlcommand = "select *  from resultshow order by score desc";
         MySqlCommand cmd = new MySqlCommand(sqlcommand, conn);
         conn.Open();
         MySqlDataAdapter ad = new MySqlDataAdapter(cmd);
@@ -48,7 +48,7 @@ public partial class Default4 : System.Web.UI.Page
         ad.Fill(ds);
         ListView1.DataSource = ds;
         ListView1.DataBind();
-
+//this.FileUpload2.Attributes.Add("onchange", "test2()");
     }
     /*
     private void OnCreationCompleted(IAsyncResult r)
@@ -123,6 +123,7 @@ public partial class Default4 : System.Web.UI.Page
                 nle.CreateTemplate(subject);
             }
         }
+        //subject.Dispose();
         return fileLocation;
     }
     /*
@@ -160,15 +161,20 @@ public partial class Default4 : System.Web.UI.Page
         OpenImageTemplate(faceView1, out _subject1);
         MySqlConnection conn = new MySqlConnection("server=localhost;database=test;uid=root;password=root");
         conn.Open();
-        String sqlcommand = String.Format("select data from imgdata");
+        String sqlcommand = String.Format("select * from imgdata");
         MySqlCommand cmd = new MySqlCommand(sqlcommand, conn);
         MySqlDataReader msr = cmd.ExecuteReader();
         while(msr.Read())
         {
             
             
-
+            string id = (string)msr.GetValue(1);
             byte[] blob = (byte[])msr.GetValue(0);
+            string name = (string)msr.GetValue(2);
+            string gender = (string)msr.GetValue(3);
+            DateTime bir = (DateTime)msr.GetValue(4);
+            string birth = bir.ToShortDateString(); 
+            string phonenumber = (string)msr.GetValue(5); ;
             Neurotec.Images.NImage img = ImageData.getNImageDataFromBytes(blob);
             NFace face = new NFace();
             face.Image = img;
@@ -184,7 +190,7 @@ public partial class Default4 : System.Web.UI.Page
                 int score1=nm.Verify(_subject1.GetTemplateBuffer(), subject.GetTemplateBuffer());
              //   _biometricClient.BeginVerify(_subject1,subject, OnVerifyCompleted, null);
                
-                btlist.Add(new btnode(blob, score1));
+                btlist.Add(new btnode(blob, score1,id,name,gender,birth,phonenumber));
 
             }
                 
@@ -200,11 +206,16 @@ public partial class Default4 : System.Web.UI.Page
         string str = "";
         for(int i=0;i<btlist.Count;i++)
         {
-            sqlcommand = "insert into resultshow(score,data) values(@score,@data)";
+            sqlcommand = "insert into resultshow(score,id,name,gender,birth,phonenumber,data) values(@score,@id,@name,@gender,@birth,@phonenumber,@data)";
             cmd = new MySqlCommand(sqlcommand, conn);
-            MySqlParameter[] param = new MySqlParameter[2];
+            MySqlParameter[] param = new MySqlParameter[7];
             param[0] = new MySqlParameter("@score", btlist[i].score);
-            param[1] = new MySqlParameter("@data", btlist[i].blob);
+            param[1] = new MySqlParameter("@id", btlist[i].id);
+            param[2] = new MySqlParameter("@name", btlist[i].name);
+            param[3] = new MySqlParameter("@gender", btlist[i].gender);
+            param[4] = new MySqlParameter("@birth", btlist[i].birth);
+            param[5] = new MySqlParameter("@phonenumber", btlist[i].phonenumber);
+            param[6] = new MySqlParameter("@data", btlist[i].blob);
             for (int j = 0; j < param.Length; j++)
                 cmd.Parameters.Add(param[j]);
             conn.Open();
@@ -260,7 +271,7 @@ public partial class Default4 : System.Web.UI.Page
         conn.Dispose();
         msr.Dispose();
         */
-        Response.Redirect("Default5.aspx", false);
+        Response.Redirect("Default4.aspx", false);
     }
     private void deleteresultshow()
     {
@@ -276,12 +287,35 @@ public partial class Default4 : System.Web.UI.Page
     {
         public byte[] blob;
         public int score;
-        public btnode(byte[] blob,int score)
+        public string id;
+        public string name;
+        public string gender;
+        public string birth;
+        public string phonenumber;
+        public btnode(byte[] blob,int score,string id,string name,string gender,string birth,string phonenumber)
         {
             this.blob=new byte[blob.Length];
             blob.CopyTo(this.blob, 0);
             this.score = score;
+            this.id = id;
+            this.name = name;
+            this.gender = gender;
+            this.birth = birth;
+            this.phonenumber = phonenumber;
 
         }
+    }
+
+    protected void detect_Click(object sender, EventArgs e)
+    {
+        Response.Redirect("Default3.aspx");
+    }
+    protected void match_Click(object sender, EventArgs e)
+    {
+        Response.Redirect("Default4.aspx");
+    }
+    protected void facedata_Click(object sender, EventArgs e)
+    {
+        Response.Redirect("uploading.aspx");
     }
 }

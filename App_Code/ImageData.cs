@@ -6,13 +6,14 @@ using System.Linq;
 using System.Web;
 using MySql.Data.MySqlClient;
 using System.Text;
+using System.Web.UI.WebControls;
 
 /// <summary>
 /// Class1 的摘要说明
 /// </summary>
 public class ImageData
 {
-    
+   
     public ImageData()
     {
         //
@@ -75,17 +76,22 @@ public class ImageData
     {
          
      
-        MySqlParameter[] param = new MySqlParameter[1];
+        MySqlParameter[] param = new MySqlParameter[6];
        
-      //  param[0] = new MySqlParameter("@ID", theme.ID);
+      //  param[0] = new MySqlParameter("@id", theme.ID);
         param[0] = new MySqlParameter("@data", theme.data);
+        param[1] = new MySqlParameter("@name", theme.name);
+        param[2] = new MySqlParameter("@gender", theme.gender);
+        param[3] = new MySqlParameter("@birth", theme.birth);
+        param[4] = new MySqlParameter("@id", theme.ID);
+        param[5] = new MySqlParameter("@phonenumber", theme.phonenumber);
         inserttotest(param);
         return true;
     }
     private static void inserttotest(MySqlParameter[] param)
     {
         MySqlConnection conn = new MySqlConnection("server=localhost;database=test;uid=root;password=root");
-        string sqlcommand = "insert into imgdata(data) values(@data)";
+        string sqlcommand = "insert into imgdata(data,id,name,gender,birth,phonenumber) values(@data,@id,@name,@gender,@birth,@phonenumber)";
         MySqlCommand cmd = new MySqlCommand(sqlcommand, conn);
         for(int i= 0;i<param.Length;i++)
            cmd.Parameters.Add(param[i]);
@@ -152,17 +158,25 @@ public class Theme
 {
     public string ID;
     public byte[] data;
+    public string name;
+    public string gender;
+    public string birth;
+    public string phonenumber;
     //        public int dc_len;
     //        public string 
     //        public string dc_title;
     //        public string dc_titleTokens;
     //        public string dc_descriptionTokens;
     //        public string dc_description;
-    public Theme(byte[] data)
+    public Theme(byte[] data,string id,string name,string gender,string birth,string phonenumber)
     {
-       
-        this.ID = System.DateTime.Now.Ticks.ToString();
+
+        this.ID = id;
         this.data = data;
+        this.name = name;
+        this.gender = gender;
+        this.birth = birth;
+        this.phonenumber = phonenumber;
         //            dc_len = 0;
         //            dc_title = string.Empty;
         //            dc_titleTokens = string.Empty;

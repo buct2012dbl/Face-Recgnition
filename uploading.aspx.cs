@@ -30,8 +30,20 @@ public partial class uploading : System.Web.UI.Page
                 
             }
             
-            Theme theme = new Theme(ImageData.returnbyte(savePath));
+            Theme theme = new Theme(ImageData.returnbyte(savePath),TextBox5.Text,TextBox2.Text,TextBox4.Text,TextBox3.Text,TextBox6.Text);
             ImageData.SaveQuery(theme);
         }
+    }
+    protected void detect_Click(object sender, EventArgs e)
+    {
+        Response.Redirect("Default3.aspx");
+    }
+    protected void match_Click(object sender, EventArgs e)
+    {
+        Response.Redirect("Default4.aspx");
+    }
+    protected void facedata_Click(object sender, EventArgs e)
+    {
+        Response.Redirect("uploading.aspx");
     }
 }
